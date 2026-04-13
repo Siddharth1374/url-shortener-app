@@ -1,7 +1,26 @@
-import axios from "axios";
+const express = require("express");
+const cors = require("cors");
 
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
-});
+const app = express();
+app.use(cors({
+  origin: function (origin, callback) {
+    if (
+      !origin ||
+      origin.endsWith(".vercel.app") ||
+      origin === "http://localhost:5173"
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 
-export default API;
+app.use(express.json());
+
+const urlRoutes = require("./routes/urlRoutes");
+app.use("/", urlRoutes);
+
+module.exports = app;
